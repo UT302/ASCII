@@ -20,16 +20,17 @@ while not done:
         if event.type == pygame.QUIT:
             print("User asked to quit.")
             done = True
-        elif even.type == pygame.KEYDOWN:
+        elif event.type == pygame.KEYDOWN:
             print("User pressed a key.")
+        elif event.type == pygame.KEYUP:
+            print("User let go of a key.")
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            for x in range(0, 100, 20):
+                pygame.draw.line(screen, GREEN, [x, 0], [x, 100], 5)
+            print("User pressed a mouse button.")
 
-
-
-    screen.fill(WHITE)
-
-    pygame.display.flip()
-
-        clock.tick(60)
+        pygame.display.flip()
+    clock.tick(60)
 
 
 
