@@ -1,4 +1,5 @@
 import pygame
+
 pygame.init()
 
 BLACK = (0, 0, 0)
