@@ -4,15 +4,15 @@ import arcade
 import os 
 
 
-STARTING_ASTEROD_COUNT = 3 
+STARTING_ASTEROID_COUNT = 3 
 SCALE = 0.5
 OFFSCREEN_SPACE = 300
 SCREEN_WIDTH = 800
-SCREEN_HIGHT = 600
+SCREEN_HEIGHT = 600
 LEFT_LIMIT =  -OFFSCREEN_SPACE
 RIGHT_LIMIT = SCREEN_WIDTH + OFFSCREEN_SPACE
 BOTTOM_LIMIT = -OFFSCREEN_SPACE
-TOP_LIMIT = SCREEN_HIGHT + OFFSCREEN_SPACE
+TOP_LIMIT = SCREEN_HEIGHT + OFFSCREEN_SPACE
 
 
 
@@ -26,19 +26,21 @@ class TurningSprite(arcade.Sprite): # Sprite that sets its angle to the directio
 class ShipSprite(arcade.Sprite): # Sprite of a space ship from arcade.Sprite
 
     # Call the parent Sprite constructor
-    def __init__(self, filename, scale)
+    def __init__(self, filename, scale):
 
-    # Info in where we are going
-    # Angle comes in automatically from the parent class
-    
-    self.thrust = 0
-    self.speed = 0
-    self.max_speed = 4
-    self.drag = 0.05
-    self.respawning = 0
+        super().__init__(filename, scale)
 
-    # Mark that we are respawning
-    self.respawn()
+        # Info in where we are going
+        # Angle comes in automatically from the parent class
+        
+        self.thrust = 0
+        self.speed = 0
+        self.max_speed = 4
+        self.drag = 0.05
+        self.respawning = 0
+
+        # Mark that we are respawning
+        self.respawn()
 
     def respawn(self): # Called when we die and need to make a new ship, 'respawning' is an invulnerability timer
         # If We are in the middle of respawning, this is non-zero.
@@ -104,22 +106,24 @@ class MyGame(arcade.Window): # Main application class
 
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
+        file_path = os.path.dirname(os.path.abspath("/home/ponch/Stuff/repos/ASCII/arcade_lib/asteroids.py"))
+        os.chdir(file_path)
         self.frame_count = 0
         self.game_over = False
 
         # Sprite lists
         self.all_sprites_list = None
-        self.asteroid_list = None
+        self.asteroid_list =  None
         self.bullet_list = None
         self.ship_life_list = None
 
         # Set up the player
         self.score = 0 
-        self.player_sprite = ShipSprite("/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/playerShip1_orange.png") 
+        self.player_sprite = None
         self.lives = 3
 
         # Sounds
-        self.laser_sound = arcade.load_sound("/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/sounds/laser1.wav")
+        self.laser_sound = arcade.load_sound("sounds/laser1.wav")
 
     def start_new_game(self): # Set up the game and initialize the variables 
 
@@ -134,26 +138,26 @@ class MyGame(arcade.Window): # Main application class
 
         # Set up the player
         self.score = 0
-        self.player_sprite = ShipSprite("/home/ponch/.local/lib/python3.5/site-packages/arcade/exam
-                ples/images/playerShip1_orange.pngj", SCALE)
+        self.player_sprite = ShipSprite("images/playerShip1_orange.png", SCALE)
+
         self.all_sprites_list.append(self.player_sprite)
         self.lives = 3
 
         # Set up liitle icons that represent the player lives
         cur_pos = 10
         for i in range(self.lives):
-            life = arcade.Sprite("/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/playerLife1_orange.png", SCALE)
+            life = arcade.Sprite("images/playerLife1_orange.png", SCALE)
             life.center_x = cur_pos + life.width
             life.center_y = life.height
             cur_pos += life.width
-            self.all_sprites_list.append(self.player_sprites)
+            self.all_sprites_list.append(life)
             self.ship_life_list.append(life)
 
         # Make the asteroids
-        image_list = ("/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_big1.png",
-                      "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_big2.png",
-                      "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_big3.png",
-                      "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_big4.png")
+        image_list = ("images/meteorGrey_big1.png",
+                      "images/meteorGrey_big2.png",
+                      "images/meteorGrey_big3.png",
+                      "images/meteorGrey_big4.png")
         
         for i in range(STARTING_ASTEROID_COUNT):
             image_no = random.randrange(4)
@@ -166,7 +170,7 @@ class MyGame(arcade.Window): # Main application class
             enemy_sprite.change_x = random.random() * 2 - 1
             enemy_sprite.change_y = random.random() * 2 - 1
 
-            enemy_sprite.change_angle = random.random() - 0.5) * 2
+            enemy_sprite.change_angle = random.random() - (0.5) * 2
             enemy_sprite.size = 4
             self.all_sprites_list.append(enemy_sprite)
             self.asteroid_list.append(enemy_sprite)
@@ -183,14 +187,14 @@ class MyGame(arcade.Window): # Main application class
         output = f"Score: {self.score}"
         arcade.draw_text(output, 10, 70, arcade.color.WHITE, 13)
         
-        output = f"Asteroid C: {len(self.score)}"
+        output = f"Asteroid Count: {len(self.asteroid_list)}"
         arcade.draw_text(output, 10, 50, arcade.color.WHITE, 13)
 
     
     def on_key_press(self, symbol, modifiers): # Shoot if the player hit the space bar and we aren't respawning.
 
         if not self.player_sprite.respawning and symbol == arcade.key.SPACE:
-            bullet_sprite = BulletSprite("/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/laserBlue01.png", SCALE)
+            bullet_sprite = BulletSprite("images/laserBlue01.png", SCALE)
             bullet_sprite.guid = "Bullet"
 
             bullet_speed = 13
@@ -203,24 +207,24 @@ class MyGame(arcade.Window): # Main application class
 
             bullet_sprite.center_x = self.player_sprite.center_x
             bullet_sprite.center_y = self.player_sprite.center_y
-            bullet_sprite.update
+            bullet_sprite.update()
 
-            self.all_sprite_list.append(bullet_sprite)
+            self.all_sprites_list.append(bullet_sprite)
             self.bullet_list.append(bullet_sprite)
 
-            # arcade.play_sound(self.Laser_sound)
+                # arcade.play_sound(self.Laser_sound)
 
-       if symbol == arcade.key.LEFT:
-           self.player_sprite.change_angle = 3
+        if symbol == arcade.key.LEFT:
+            self.player_sprite.change_angle = 3
 
-       elif symbol == arcade.key.RIGHT:
-           self.player_sprite.change_angle = -3
+        elif symbol == arcade.key.RIGHT:
+            self.player_sprite.change_angle = -3
 
-       elif symbol == arcade.key.UP:
-           self.player_sprite.thrust = 0.15
+        elif symbol == arcade.key.UP:
+            self.player_sprite.thrust = 0.15
 
-       elif symbol == arcade.key.DOWN:
-           self.player_sprite.change_angle = -.2
+        elif symbol == arcade.key.DOWN:
+            self.player_sprite.change_angle = -.2
 
 
     def on_key_release(self, symbol, modifiers):
@@ -248,8 +252,8 @@ class MyGame(arcade.Window): # Main application class
 
               for i in range(3):
                   image_no = random.randrange(2)
-                  image_list = ["/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_med1.png", 
-                                "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_med2.png"] 
+                  image_list = ["images/meteorGrey_med1.png", 
+                                "images/meteorGrey_med2.png"] 
 
                   enemy_sprite = AsteroidSprite(image_list[image_no],
                                                 SCALE * 1.5)
@@ -270,8 +274,8 @@ class MyGame(arcade.Window): # Main application class
 
               for i in range(3):
                   image_no = random.randrange(2)
-                  image_list = ["/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_small1.png",
-                                "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_small2.png"]
+                  image_list = ["images/meteorGrey_small1.png",
+                                "images/meteorGrey_small2.png"]
 
                   enemy_sprite = AsteroidSprite(image_list[image_no],
                                                 SCALE * 1.5)
@@ -292,8 +296,8 @@ class MyGame(arcade.Window): # Main application class
 
               for i in range(3):
                   image_no = random.randrange(2)
-                  image_list = ["/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_tiny1.png",
-                                "/home/ponch/.local/lib/python3.5/site-packages/arcade/examples/images/meteorGrey_tiny2.png"]
+                  image_list = ["images/meteorGrey_tiny1.png",
+                                "images/meteorGrey_tiny2.png"]
 
                   enemy_sprite = AsteroidSprite(image_list[image_no],
                                                 SCALE * 1.5)
